@@ -248,8 +248,10 @@ export default function Terminal() {
         return
       }
 
-      if (trimmed === 'cat resume.pdf') {
-        newLines.push({ id: nextId(), type: 'output', content: <div className="cmd-output"><span className="dim">{'>'}</span> Resume download coming soon. <span className="dim">For now:</span> <span className="cyan">[contact]</span> <span className="dim">me directly.</span></div> })
+
+      // Matrix rain easter egg
+      if (name === 'hack') {
+        newLines.push({ id: nextId(), type: 'output', content: <MatrixRain /> })
         newLines.push({ id: nextId(), type: 'system', content: '' })
         setLines((prev) => [...prev, ...newLines])
         setCmdHistory((prev) => [cmd.trim(), ...prev])
@@ -259,9 +261,45 @@ export default function Terminal() {
         return
       }
 
-      // Matrix rain easter egg
-      if (name === 'hack') {
-        newLines.push({ id: nextId(), type: 'output', content: <MatrixRain /> })
+      // cat command — cat skill.txt shows skill detail
+      if (name === 'cat') {
+        const fileName = args.join(' ')
+        const match = fileName.replace(/\.txt$/i, '')
+        // Find skill by case-insensitive match
+        const skillKey = Object.keys(profile.skillDetails).find(
+          (k) => k.toLowerCase() === match.toLowerCase()
+        )
+        if (skillKey && profile.skillDetails[skillKey]) {
+          const d = profile.skillDetails[skillKey]
+          newLines.push({
+            id: nextId(),
+            type: 'output',
+            content: (
+              <div className="cmd-output">
+                <div><span className="amber">╔══════════════════════════════════════╗</span></div>
+                <div><span className="amber">║</span> <span className="bright">{skillKey}</span><span className="amber">{' '.repeat(Math.max(1, 35 - skillKey.length))}║</span></div>
+                <div><span className="amber">╚══════════════════════════════════════╝</span></div>
+                <br />
+                <div><span className="dim">  experience:</span> <span className="bright">{d.years}</span></div>
+                <div><span className="dim">  proficiency:</span> <span className="accent">{d.level}</span></div>
+                <div><span className="dim">  notes:</span> {d.note}</div>
+                <br />
+                <div><span className="dim">  used at:</span></div>
+                {d.used.map((company, i) => (
+                  <div key={i}><span className="dim">    ▸</span> <span className="cyan">{company}</span></div>
+                ))}
+              </div>
+            ),
+          })
+        } else if (fileName === 'resume.pdf') {
+          newLines.push({ id: nextId(), type: 'output', content: <div className="cmd-output"><span className="dim">{'>'}</span> Resume download coming soon. <span className="dim">For now:</span> <span className="cyan">[contact]</span> <span className="dim">me directly.</span></div> })
+        } else {
+          newLines.push({
+            id: nextId(),
+            type: 'output',
+            content: <span className="error">cat: {fileName || '???'}: No such file. Try <span className="accent">cat python.txt</span></span>,
+          })
+        }
         newLines.push({ id: nextId(), type: 'system', content: '' })
         setLines((prev) => [...prev, ...newLines])
         setCmdHistory((prev) => [cmd.trim(), ...prev])
@@ -396,6 +434,15 @@ export default function Terminal() {
   // Click anywhere to focus input, and handle inline [command] clicks
   const handleBodyClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement
+    // Handle skill tag clicks → run cat skill.txt
+    if (target.classList.contains('skill-clickable')) {
+      const skill = target.getAttribute('data-skill')
+      if (skill) {
+        e.stopPropagation()
+        executeCommand(`cat ${skill}.txt`)
+        return
+      }
+    }
     // Handle inline [command] tag clicks (cyan spans like [skills], [work], etc.)
     if (target.classList.contains('cyan') && target.closest('.cmd-output')) {
       const text = target.textContent?.replace(/[[\]]/g, '').trim()

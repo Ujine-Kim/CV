@@ -163,10 +163,20 @@
   transition: all 0.15s;
 }
 
+.skill-clickable {
+  cursor: pointer;
+}
+
 .skill-tag:hover {
   background: rgba(51, 255, 51, 0.08);
   border-color: var(--phosphor-dim);
   text-shadow: 0 0 6px var(--phosphor-glow);
+}
+
+.skill-clickable:hover::after {
+  content: ' ↵';
+  font-size: 0.75em;
+  opacity: 0.5;
 }
 
 /* ────── TIMELINE ────── */

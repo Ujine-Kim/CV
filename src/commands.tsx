@@ -125,7 +125,7 @@ const commands: Command[] = [
               </div>
               <div className="skills-grid">
                 {items.map((skill) => (
-                  <span key={skill} className="skill-tag">
+                  <span key={skill} className="skill-tag skill-clickable" data-skill={skill}>
                     {skill}
                   </span>
                 ))}
