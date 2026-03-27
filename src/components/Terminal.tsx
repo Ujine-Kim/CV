@@ -276,9 +276,7 @@ export default function Terminal() {
             type: 'output',
             content: (
               <div className="cmd-output">
-                <div><span className="amber">╔══════════════════════════════════════╗</span></div>
-                <div><span className="amber">║</span> <span className="bright">{skillKey}</span><span className="amber">{' '.repeat(Math.max(1, 35 - skillKey.length))}║</span></div>
-                <div><span className="amber">╚══════════════════════════════════════╝</span></div>
+                <pre className="amber skill-box">{`╔${'═'.repeat(38)}╗\n║ ${skillKey.padEnd(37)}║\n╚${'═'.repeat(38)}╝`}</pre>
                 <br />
                 <div><span className="dim">  experience:</span> <span className="bright">{d.years}</span></div>
                 <div><span className="dim">  proficiency:</span> <span className="accent">{d.level}</span></div>
